@@ -310,6 +310,10 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
           RIGHT
         </button>
       </div>
+
+      <p className="mt-3 text-center text-[10px] tracking-[0.12em] text-[var(--text)]/60 md:hidden">
+        SWIPE ON THE GRID TO MOVE
+      </p>
     </div>
   );
 };
