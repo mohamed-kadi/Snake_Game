@@ -13,6 +13,7 @@ export type Point = { x: number; y: number };
 export enum GameStatus {
   IDLE = 'IDLE',
   PLAYING = 'PLAYING',
+  PAUSED = 'PAUSED',
   GAME_OVER = 'GAME_OVER',
 }
 
