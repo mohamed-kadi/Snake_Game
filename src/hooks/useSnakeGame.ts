@@ -2,6 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { GRID_SIZE, INITIAL_SNAKE } from '@/src/utils/constants';
 import { Direction, GameStatus, Point } from '@/src/utils/types';
 
+const BASE_TICK_MS = 120;
+const MIN_TICK_MS = 70;
+const SPEED_STEP_EVERY_POINTS = 50;
+const SPEED_STEP_MS = 8;
+
 interface UseSnakeGameProps {
   onScoreChange: (score: number) => void;
   onEat?: () => void;
@@ -147,11 +152,17 @@ export const useSnakeGame = ({ onScoreChange, onEat, status, onStatusChange }: U
       lastUpdateRef.current = time;
     }
 
-    if (time - lastUpdateRef.current > 120) {
+    const speedLevel = Math.floor(score / SPEED_STEP_EVERY_POINTS);
+    const tickInterval = Math.max(
+      MIN_TICK_MS,
+      BASE_TICK_MS - speedLevel * SPEED_STEP_MS
+    );
+
+    if (time - lastUpdateRef.current > tickInterval) {
       moveSnake();
       lastUpdateRef.current = time;
     }
-  }, [status, moveSnake]);
+  }, [status, score, moveSnake]);
 
   return {
     snake,
