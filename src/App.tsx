@@ -43,6 +43,7 @@ export default function App() {
     { label: 'Retro', value: GameTheme.RETRO },
     { label: 'Minimal', value: GameTheme.MINIMAL },
   ];
+  const speedLevel = Math.floor(score / 50) + 1;
 
   useEffect(() => {
     const savedSettings = settingsService.getSettings();
@@ -196,7 +197,7 @@ export default function App() {
       </div>
 
       <div className="relative z-10 w-full flex flex-col">
-        <GlitchHeader score={score} bestScore={bestScore} />
+        <GlitchHeader score={score} bestScore={bestScore} speedLevel={speedLevel} />
 
         {/* Main Interface */}
         <main className="flex-1 w-full max-w-7xl mx-auto flex min-h-0 px-4 md:px-6 py-3">

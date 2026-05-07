@@ -3,9 +3,10 @@ import React from 'react';
 interface GlitchHeaderProps {
   score: number;
   bestScore: number;
+  speedLevel: number;
 }
 
-export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score, bestScore }) => {
+export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score, bestScore, speedLevel }) => {
   return (
     <header className="w-full z-10 border-b-2 border-double border-[var(--primary)] pb-6 mb-8">
       <div className="max-w-7xl mx-auto flex justify-between items-center w-full px-2">
@@ -27,7 +28,7 @@ export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score, bestScore }) 
           </div>
           <div className="flex flex-col items-center border-l border-[var(--primary)]/20 pl-12 ml-4">
             <span className="text-[10px] uppercase opacity-50 font-bold mb-1 tracking-widest">NODE_LAYER</span>
-            <span className="text-3xl font-mono text-[var(--accent)]">08</span>
+            <span className="text-3xl font-mono text-[var(--accent)]">{speedLevel.toString().padStart(2, '0')}</span>
           </div>
         </div>
 
@@ -37,6 +38,9 @@ export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score, bestScore }) 
           </div>
           <div className="text-[10px] tracking-[0.15em] text-[var(--secondary)]">
             BEST {bestScore.toString().padStart(4, '0')}
+          </div>
+          <div className="text-[10px] tracking-[0.15em] text-[var(--accent)]">
+            LVL {speedLevel.toString().padStart(2, '0')}
           </div>
         </div>
       </div>
