@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GRID_SIZE } from '@/src/utils/constants';
-import { GameStatus } from '@/src/utils/types';
+import { Direction, GameStatus } from '@/src/utils/types';
 import { useSnakeGame } from '@/src/hooks/useSnakeGame';
 
 interface SnakeGameProps {
@@ -22,12 +22,39 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameLoopRef = useRef<number | null>(null);
 
-  const { snake, food, score, digestingIndices, resetGame, tick } = useSnakeGame({
+  const { snake, food, score, digestingIndices, resetGame, queueDirection, tick } = useSnakeGame({
     onScoreChange,
     onEat,
     status,
     onStatusChange
   });
+
+  const handleStart = useCallback(() => {
+    if (status === GameStatus.IDLE) {
+      resetGame();
+      return;
+    }
+
+    if (status === GameStatus.PAUSED) {
+      onStatusChange(GameStatus.PLAYING);
+    }
+  }, [status, resetGame, onStatusChange]);
+
+  const handlePauseToggle = useCallback(() => {
+    if (status === GameStatus.PLAYING) {
+      onStatusChange(GameStatus.PAUSED);
+    } else if (status === GameStatus.PAUSED) {
+      onStatusChange(GameStatus.PLAYING);
+    }
+  }, [status, onStatusChange]);
+
+  const handleRestart = useCallback(() => {
+    resetGame();
+  }, [resetGame]);
+
+  const handleDirectionTap = useCallback((nextDirection: Direction) => {
+    queueDirection(nextDirection);
+  }, [queueDirection]);
 
   const update = useCallback((time: number) => {
     tick(time);
@@ -164,6 +191,13 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
           </div>
         )}
 
+        {status === GameStatus.PAUSED && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md z-30">
+            <p className="text-[var(--primary)] text-xl tracking-[0.2em] mb-4">PAUSED</p>
+            <p className="text-[var(--text)]/80 text-xs tracking-[0.15em]">PRESS START OR SPACE TO RESUME</p>
+          </div>
+        )}
+
         {status === GameStatus.GAME_OVER && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 backdrop-blur-md z-30 border-4 border-[var(--secondary)]">
             <h2 className="text-4xl font-black text-[var(--secondary)] mb-2 tracking-tighter glitch-text">SIGNAL_LOST_CORE_CRITICAL</h2>
@@ -179,6 +213,69 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
             </motion.button>
           </div>
         )}
+      </div>
+
+      <div className="mt-4 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={handleStart}
+          disabled={status === GameStatus.PLAYING}
+          className="px-4 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-xs tracking-[0.15em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--primary)] hover:text-black transition-colors"
+        >
+          START
+        </button>
+        <button
+          type="button"
+          onClick={handlePauseToggle}
+          disabled={status === GameStatus.IDLE || status === GameStatus.GAME_OVER}
+          className="px-4 py-2 border-2 border-[var(--secondary)] text-[var(--secondary)] font-bold text-xs tracking-[0.15em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--secondary)] hover:text-black transition-colors"
+        >
+          {status === GameStatus.PAUSED ? 'RESUME' : 'PAUSE'}
+        </button>
+        <button
+          type="button"
+          onClick={handleRestart}
+          className="px-4 py-2 border-2 border-[var(--text)] text-[var(--text)] font-bold text-xs tracking-[0.15em] hover:bg-[var(--text)] hover:text-black transition-colors"
+        >
+          RESTART
+        </button>
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-2 max-w-[220px] mx-auto select-none">
+        <div />
+        <button
+          type="button"
+          onClick={() => handleDirectionTap('UP')}
+          disabled={status !== GameStatus.PLAYING}
+          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+        >
+          UP
+        </button>
+        <div />
+        <button
+          type="button"
+          onClick={() => handleDirectionTap('LEFT')}
+          disabled={status !== GameStatus.PLAYING}
+          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+        >
+          LEFT
+        </button>
+        <button
+          type="button"
+          onClick={() => handleDirectionTap('DOWN')}
+          disabled={status !== GameStatus.PLAYING}
+          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+        >
+          DOWN
+        </button>
+        <button
+          type="button"
+          onClick={() => handleDirectionTap('RIGHT')}
+          disabled={status !== GameStatus.PLAYING}
+          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+        >
+          RIGHT
+        </button>
       </div>
     </div>
   );

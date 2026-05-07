@@ -45,6 +45,15 @@ export const useSnakeGame = ({ onScoreChange, onEat, status, onStatusChange }: U
     onStatusChange(GameStatus.PLAYING);
   }, [onScoreChange, onStatusChange, generateFood]);
 
+  const queueDirection = useCallback((nextDirection: Direction) => {
+    if (status !== GameStatus.PLAYING) return;
+
+    if (nextDirection === 'UP' && direction !== 'DOWN') nextDirectionRef.current = 'UP';
+    if (nextDirection === 'DOWN' && direction !== 'UP') nextDirectionRef.current = 'DOWN';
+    if (nextDirection === 'LEFT' && direction !== 'RIGHT') nextDirectionRef.current = 'LEFT';
+    if (nextDirection === 'RIGHT' && direction !== 'LEFT') nextDirectionRef.current = 'RIGHT';
+  }, [status, direction]);
+
   const moveSnake = useCallback(() => {
     if (status !== GameStatus.PLAYING) return;
 
@@ -96,7 +105,7 @@ export const useSnakeGame = ({ onScoreChange, onEat, status, onStatusChange }: U
   }, [snake, food, score, onScoreChange, onEat, onStatusChange, generateFood, status]);
 
   useEffect(() => {
-    if (status !== GameStatus.PLAYING) return;
+    if (status === GameStatus.GAME_OVER) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toUpperCase();
@@ -105,19 +114,28 @@ export const useSnakeGame = ({ onScoreChange, onEat, status, onStatusChange }: U
       }
 
       switch (key) {
+        case ' ':
+          if (status === GameStatus.PLAYING) {
+            onStatusChange(GameStatus.PAUSED);
+          } else if (status === GameStatus.PAUSED) {
+            onStatusChange(GameStatus.PLAYING);
+          } else if (status === GameStatus.IDLE) {
+            resetGame();
+          }
+          break;
         case 'ARROWUP':
-        case 'W': if (direction !== 'DOWN') nextDirectionRef.current = 'UP'; break;
+        case 'W': queueDirection('UP'); break;
         case 'ARROWDOWN':
-        case 'S': if (direction !== 'UP') nextDirectionRef.current = 'DOWN'; break;
+        case 'S': queueDirection('DOWN'); break;
         case 'ARROWLEFT':
-        case 'A': if (direction !== 'RIGHT') nextDirectionRef.current = 'LEFT'; break;
+        case 'A': queueDirection('LEFT'); break;
         case 'ARROWRIGHT':
-        case 'D': if (direction !== 'LEFT') nextDirectionRef.current = 'RIGHT'; break;
+        case 'D': queueDirection('RIGHT'); break;
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [direction, status]);
+  }, [status, onStatusChange, resetGame, queueDirection]);
 
   const tick = useCallback((time: number) => {
     if (status !== GameStatus.PLAYING) {
@@ -141,6 +159,7 @@ export const useSnakeGame = ({ onScoreChange, onEat, status, onStatusChange }: U
     score,
     digestingIndices,
     resetGame,
+    queueDirection,
     tick
   };
 };
