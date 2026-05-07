@@ -193,7 +193,7 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
   }, [snake, food, digestingIndices, accentColor]);
 
   return (
-    <div className="relative group w-full max-w-[500px] min-h-[300px]">
+    <div className="relative group w-full max-w-[min(500px,calc(100vh-320px))] min-h-[300px]">
       <div
         className="relative aspect-square glass-panel neon-border overflow-hidden p-0 border-[var(--primary)] shadow-[0_0_20px_var(--primary)_inset,0_0_20px_var(--primary)] touch-none"
         onTouchStart={handleTouchStart}
@@ -248,12 +248,12 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
         )}
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-3">
+      <div className="mt-3 sm:mt-4 flex items-center justify-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={handleStart}
           disabled={status === GameStatus.PLAYING}
-          className="px-4 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-xs tracking-[0.15em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--primary)] hover:text-black transition-colors"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--primary)] hover:text-black transition-colors"
         >
           START
         </button>
@@ -261,26 +261,26 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
           type="button"
           onClick={handlePauseToggle}
           disabled={status === GameStatus.IDLE || status === GameStatus.GAME_OVER}
-          className="px-4 py-2 border-2 border-[var(--secondary)] text-[var(--secondary)] font-bold text-xs tracking-[0.15em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--secondary)] hover:text-black transition-colors"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-[var(--secondary)] text-[var(--secondary)] font-bold text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--secondary)] hover:text-black transition-colors"
         >
           {status === GameStatus.PAUSED ? 'RESUME' : 'PAUSE'}
         </button>
         <button
           type="button"
           onClick={handleRestart}
-          className="px-4 py-2 border-2 border-[var(--text)] text-[var(--text)] font-bold text-xs tracking-[0.15em] hover:bg-[var(--text)] hover:text-black transition-colors"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-[var(--text)] text-[var(--text)] font-bold text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] hover:bg-[var(--text)] hover:text-black transition-colors"
         >
           RESTART
         </button>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2 max-w-[220px] mx-auto select-none">
+      <div className="mt-3 sm:mt-4 grid grid-cols-3 gap-1.5 sm:gap-2 max-w-[190px] sm:max-w-[220px] mx-auto select-none">
         <div />
         <button
           type="button"
           onClick={() => handleDirectionTap('UP')}
           disabled={status !== GameStatus.PLAYING}
-          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+          className="px-2 sm:px-3 py-1.5 sm:py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-xs sm:text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
         >
           UP
         </button>
@@ -289,7 +289,7 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
           type="button"
           onClick={() => handleDirectionTap('LEFT')}
           disabled={status !== GameStatus.PLAYING}
-          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+          className="px-2 sm:px-3 py-1.5 sm:py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-xs sm:text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
         >
           LEFT
         </button>
@@ -297,7 +297,7 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
           type="button"
           onClick={() => handleDirectionTap('DOWN')}
           disabled={status !== GameStatus.PLAYING}
-          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+          className="px-2 sm:px-3 py-1.5 sm:py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-xs sm:text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
         >
           DOWN
         </button>
@@ -305,7 +305,7 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
           type="button"
           onClick={() => handleDirectionTap('RIGHT')}
           disabled={status !== GameStatus.PLAYING}
-          className="px-3 py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+          className="px-2 sm:px-3 py-1.5 sm:py-2 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-xs sm:text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
         >
           RIGHT
         </button>

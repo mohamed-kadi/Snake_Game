@@ -63,7 +63,7 @@
 
 @layer base {
   body {
-    @apply antialiased overflow-hidden h-screen w-screen;
+    @apply antialiased overflow-x-hidden overflow-y-auto min-h-screen w-full;
     background-color: var(--bg);
     color: var(--text);
     font-family: var(--font-family), monospace;
