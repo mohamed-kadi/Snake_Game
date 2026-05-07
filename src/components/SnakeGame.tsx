@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { GRID_SIZE } from '@/src/utils/constants';
 import { Direction, GameStatus } from '@/src/utils/types';
 import { useSnakeGame } from '@/src/hooks/useSnakeGame';
@@ -21,6 +21,7 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameLoopRef = useRef<number | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const { snake, food, score, digestingIndices, resetGame, queueDirection, tick } = useSnakeGame({
     onScoreChange,
@@ -55,6 +56,34 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
   const handleDirectionTap = useCallback((nextDirection: Direction) => {
     queueDirection(nextDirection);
   }, [queueDirection]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (status !== GameStatus.PLAYING || !touchStartRef.current) return;
+
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+    const swipeThreshold = 24;
+
+    if (Math.max(absX, absY) < swipeThreshold) return;
+
+    if (absX > absY) {
+      queueDirection(deltaX > 0 ? 'RIGHT' : 'LEFT');
+      return;
+    }
+
+    queueDirection(deltaY > 0 ? 'DOWN' : 'UP');
+  }, [status, queueDirection]);
 
   const update = useCallback((time: number) => {
     tick(time);
@@ -165,7 +194,11 @@ export const SnakeGame: React.FC<SnakeGameProps> = ({
 
   return (
     <div className="relative group w-full max-w-[500px] min-h-[300px]">
-      <div className="relative aspect-square glass-panel neon-border overflow-hidden p-0 border-[var(--primary)] shadow-[0_0_20px_var(--primary)_inset,0_0_20px_var(--primary)]">
+      <div
+        className="relative aspect-square glass-panel neon-border overflow-hidden p-0 border-[var(--primary)] shadow-[0_0_20px_var(--primary)_inset,0_0_20px_var(--primary)] touch-none"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className="absolute inset-0 grid-bg opacity-10 pointer-events-none" />
         <canvas
           ref={canvasRef}
