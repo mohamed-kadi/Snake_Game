@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Space+Grotesk:wght@300;700&family=Press+Start+2P&family=Inter:wght@400;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-family, "VT323", monospace);
+  --font-mono: var(--font-family, "VT323", monospace);
+}
+
+:root {
+  --primary: #00FFFF;
+  --secondary: #FF00FF;
+  --accent: #00FF41;
+  --bg: #000000;
+  --text: #00FFFF;
+  --panel-border: 2px double var(--primary);
+  --panel-shadow: 4px 4px 0px var(--secondary);
+  --font-family: "VT323";
+}
+
+.theme-GLITCH {
+  --primary: #00FFFF;
+  --secondary: #FF00FF;
+  --accent: #00FF41;
+  --bg: #000000;
+  --text: #00FFFF;
+  --panel-border: 2px double var(--primary);
+  --panel-shadow: 4px 4px 0px var(--secondary);
+  --font-family: "VT323";
+}
+
+.theme-CYBER {
+  --primary: #00E5FF;
+  --secondary: #7000FF;
+  --accent: #FF00AA;
+  --bg: #0D0221;
+  --text: #00E5FF;
+  --panel-border: 1px solid var(--primary);
+  --panel-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+  --font-family: "Space Grotesk";
+}
+
+.theme-RETRO {
+  --primary: #00FF41;
+  --secondary: #00AA22;
+  --accent: #D4FF00;
+  --bg: #020502;
+  --text: #00FF41;
+  --panel-border: 4px solid var(--primary);
+  --panel-shadow: 8px 8px 0px var(--secondary);
+  --font-family: "Press Start 2P";
+}
+
+.theme-MINIMAL {
+  --primary: #FFFFFF;
+  --secondary: #888888;
+  --accent: #AAAAAA;
+  --bg: #050505;
+  --text: #FFFFFF;
+  --panel-border: 1px solid #666;
+  --panel-shadow: none;
+  --font-family: "Inter";
+}
+
+@layer base {
+  body {
+    @apply antialiased overflow-hidden h-screen w-screen;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-family), monospace;
+  }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes scanline {
+  0% { bottom: 100%; }
+  100% { bottom: 0%; }
+}
+
+@keyframes noise {
+  0% { transform: translateX(0); }
+  10% { transform: translateX(-1px); }
+  20% { transform: translateX(1px); }
+  30% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  50% { transform: translateX(-3px); }
+}
+
+.glitch-text:hover {
+  animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) both infinite;
+}
+
+.scanline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--secondary);
+  opacity: 0.1;
+  z-index: 100;
+  pointer-events: none;
+  animation: scanline 8s linear infinite;
+}
+
+.static-noise {
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  z-index: 99;
+  pointer-events: none;
+  animation: noise 0.2s steps(2) infinite;
+}
+
+.glass-panel {
+  background-color: color-mix(in srgb, var(--bg), #fff 3%);
+  border: var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  image-rendering: pixelated;
+  backdrop-filter: blur(10px);
+}
+
+.glitch-heavy {
+  animation: glitch-skew 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+  filter: hue-rotate(90deg) brightness(1.5);
+  transform: scale(1.02);
+}
+
+@keyframes glitch-skew {
+  0% { transform: skew(0deg) scale(1.02); }
+  20% { transform: skew(3deg) scale(1.02); }
+  40% { transform: skew(-3deg) scale(1.02); }
+  60% { transform: skew(5deg) scale(1.02); }
+  80% { transform: skew(-5deg) scale(1.02); }
+  100% { transform: skew(0deg) scale(1.02); }
+}
+
+.neon-border {
+  border: var(--panel-border);
+  box-shadow: 0 0 10px var(--primary), inset 0 0 10px var(--primary);
+}
+
+.neon-text-cyan {
+  color: var(--primary);
+}
+
+.neon-text-pink {
+  color: var(--secondary);
+}
+
+.neon-text-lime {
+  color: var(--accent);
+}
+
+.grid-bg {
+  background-image: 
+    linear-gradient(to right, color-mix(in srgb, var(--primary), transparent 95%) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--primary), transparent 95%) 1px, transparent 1px);
+  background-size: 25px 25px;
+}
+
