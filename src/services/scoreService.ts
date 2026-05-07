@@ -6,8 +6,21 @@ export interface HighScore {
 }
 
 const STORAGE_KEY = 'neural_snake_high_scores';
+const BEST_SCORE_STORAGE_KEY = 'neural_snake_best_score';
 
 export const highScoreService = {
+  getBestScore: (): number => {
+    const stored = localStorage.getItem(BEST_SCORE_STORAGE_KEY);
+    if (!stored) return 0;
+
+    const parsed = Number(stored);
+    return Number.isFinite(parsed) ? parsed : 0;
+  },
+
+  setBestScore: (score: number): void => {
+    localStorage.setItem(BEST_SCORE_STORAGE_KEY, String(score));
+  },
+
   getScores: (): HighScore[] => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return [];

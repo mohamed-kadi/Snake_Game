@@ -9,11 +9,13 @@ import { GlitchHeader } from '@/src/components/GlitchHeader';
 import { GlitchFooter } from '@/src/components/GlitchFooter';
 import { SettingsMenu } from '@/src/components/SettingsMenu';
 import { musicService } from '@/src/services/musicService';
+import { highScoreService } from '@/src/services/scoreService';
 import { GameStatus, GameTheme } from '@/src/utils/types';
 
 export default function App() {
   const tracks = musicService.getTracks();
   const [score, setScore] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [theme, setTheme] = useState<GameTheme>(GameTheme.GLITCH);
@@ -40,6 +42,17 @@ export default function App() {
     { label: 'Retro', value: GameTheme.RETRO },
     { label: 'Minimal', value: GameTheme.MINIMAL },
   ];
+
+  useEffect(() => {
+    setBestScore(highScoreService.getBestScore());
+  }, []);
+
+  useEffect(() => {
+    if (score > bestScore) {
+      setBestScore(score);
+      highScoreService.setBestScore(score);
+    }
+  }, [score, bestScore]);
 
   // Handle Game Status Changes (Stop music on crash)
   useEffect(() => {
@@ -149,7 +162,7 @@ export default function App() {
       </div>
 
       <div className="relative z-10 w-full flex flex-col">
-        <GlitchHeader score={score} />
+        <GlitchHeader score={score} bestScore={bestScore} />
 
         {/* Main Interface */}
         <main className="flex-1 w-full max-w-7xl mx-auto flex min-h-0 px-4 md:px-6 py-3">

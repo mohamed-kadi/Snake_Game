@@ -2,9 +2,10 @@ import React from 'react';
 
 interface GlitchHeaderProps {
   score: number;
+  bestScore: number;
 }
 
-export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score }) => {
+export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score, bestScore }) => {
   return (
     <header className="w-full z-10 border-b-2 border-double border-[var(--primary)] pb-6 mb-8">
       <div className="max-w-7xl mx-auto flex justify-between items-center w-full px-2">
@@ -22,7 +23,7 @@ export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score }) => {
           </div>
           <div className="flex flex-col items-center">
             <span className="text-[10px] uppercase opacity-50 font-bold mb-1 tracking-widest">PEAK_STRENGTH</span>
-            <span className="text-3xl font-mono text-[var(--secondary)] tabular-nums">014,800</span>
+            <span className="text-3xl font-mono text-[var(--secondary)] tabular-nums">{bestScore.toString().padStart(6, '0')}</span>
           </div>
           <div className="flex flex-col items-center border-l border-[var(--primary)]/20 pl-12 ml-4">
             <span className="text-[10px] uppercase opacity-50 font-bold mb-1 tracking-widest">NODE_LAYER</span>
@@ -30,8 +31,13 @@ export const GlitchHeader: React.FC<GlitchHeaderProps> = ({ score }) => {
           </div>
         </div>
 
-        <div className="md:hidden text-5xl font-black tabular-nums tracking-tighter text-[var(--accent)]">
-          {score.toString().padStart(4, '0')}
+        <div className="md:hidden flex flex-col items-end">
+          <div className="text-5xl font-black tabular-nums tracking-tighter text-[var(--accent)]">
+            {score.toString().padStart(4, '0')}
+          </div>
+          <div className="text-[10px] tracking-[0.15em] text-[var(--secondary)]">
+            BEST {bestScore.toString().padStart(4, '0')}
+          </div>
         </div>
       </div>
     </header>
