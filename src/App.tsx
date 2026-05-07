@@ -7,17 +7,19 @@ import React, { useEffect, useRef, useState } from 'react';
 import { SnakeGame } from '@/src/components/SnakeGame';
 import { GlitchHeader } from '@/src/components/GlitchHeader';
 import { GlitchFooter } from '@/src/components/GlitchFooter';
-import { SonicLog } from '@/src/components/SonicLog';
+import { SettingsMenu } from '@/src/components/SettingsMenu';
 import { musicService } from '@/src/services/musicService';
-import { GameStatus, GameTheme, Track } from '@/src/utils/types';
+import { GameStatus, GameTheme } from '@/src/utils/types';
 
 export default function App() {
   const tracks = musicService.getTracks();
   const [score, setScore] = useState(0);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [theme, setTheme] = useState<GameTheme>(GameTheme.GLITCH);
+  const [fontFamily, setFontFamily] = useState<string>('Theme default');
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const eatAudioRef = useRef<HTMLAudioElement>(null);
@@ -25,6 +27,19 @@ export default function App() {
   
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.IDLE);
   const currentTrack = tracks[currentTrackIndex];
+  const fontOptions = [
+    { label: 'Theme default', value: 'Theme default' },
+    { label: 'VT323', value: 'VT323' },
+    { label: 'Space Grotesk', value: 'Space Grotesk' },
+    { label: 'Press Start 2P', value: 'Press Start 2P' },
+    { label: 'Inter', value: 'Inter' },
+  ];
+  const themeOptions = [
+    { label: 'Glitch', value: GameTheme.GLITCH },
+    { label: 'Cyber', value: GameTheme.CYBER },
+    { label: 'Retro', value: GameTheme.RETRO },
+    { label: 'Minimal', value: GameTheme.MINIMAL },
+  ];
 
   // Handle Game Status Changes (Stop music on crash)
   useEffect(() => {
@@ -39,15 +54,7 @@ export default function App() {
 
   const handleNext = () => {
     setCurrentTrackIndex(prev => (prev + 1) % tracks.length);
-    setProgress(0);
   };
-
-  const handlePrev = () => {
-    setCurrentTrackIndex(prev => (prev - 1 + tracks.length) % tracks.length);
-    setProgress(0);
-  };
-
-  const handleTogglePlay = () => setIsPlaying(!isPlaying);
 
   const handleEat = () => {
     setIsGlitching(true);
@@ -62,36 +69,64 @@ export default function App() {
     const audio = audioRef.current;
     if (!audio) return;
 
+    if (isMuted) {
+      audio.pause();
+      return;
+    }
+
     if (isPlaying) {
       audio.play().catch(e => console.error("Playback stopped:", e));
     } else {
       audio.pause();
     }
-  }, [isPlaying, currentTrack]);
+  }, [isPlaying, currentTrack, isMuted]);
+
+  useEffect(() => {
+    if (isMuted) {
+      setIsPlaying(false);
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const updateProgress = () => {
-      if (audio.duration) {
-        setProgress((audio.currentTime / audio.duration) * 100);
-      }
-    };
-
-    audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('ended', handleNext);
     return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
       audio.removeEventListener('ended', handleNext);
     };
   }, []);
 
   return (
-    <div className={`h-screen transition-colors duration-500 theme-${theme} grid-bg relative selection:bg-[var(--secondary)] selection:text-black overflow-hidden flex flex-col ${isGlitching ? 'glitch-heavy' : ''}`}>
-      <audio ref={audioRef} src={currentTrack.url} />
+    <div
+      className={`min-h-screen transition-colors duration-500 theme-${theme} grid-bg relative selection:bg-[var(--secondary)] selection:text-black overflow-x-hidden overflow-y-auto flex flex-col ${isGlitching ? 'glitch-heavy' : ''}`}
+      style={{
+        '--font-family': fontFamily === 'Theme default' ? undefined : `"${fontFamily}"`,
+      } as React.CSSProperties}
+    >
+      <audio ref={audioRef} src={currentTrack.url} muted={isMuted} />
       <audio ref={eatAudioRef} src="https://raw.githubusercontent.com/rafael-m-silva/snake-game/master/assets/eat.mp3" />
       <audio ref={gameOverAudioRef} src="https://raw.githubusercontent.com/rafael-m-silva/snake-game/master/assets/die.mp3" />
+      <SettingsMenu
+        isOpen={isSettingsOpen}
+        onToggleOpen={() => setIsSettingsOpen((prev) => !prev)}
+        selectedFont={fontFamily}
+        fontOptions={fontOptions}
+        onFontChange={setFontFamily}
+        selectedTheme={theme}
+        themeOptions={themeOptions}
+        onThemeChange={(nextTheme) => setTheme(nextTheme as GameTheme)}
+        isMuted={isMuted}
+        onToggleMuted={() => {
+          setIsMuted((prev) => {
+            const nextMuted = !prev;
+            if (!nextMuted) {
+              setIsPlaying(true);
+            }
+            return nextMuted;
+          });
+        }}
+      />
       
       {/* Glitch Infrastructure */}
       {theme === GameTheme.GLITCH && (
@@ -113,28 +148,12 @@ export default function App() {
         />
       </div>
 
-      <div className="relative z-10 w-full h-full flex flex-col overflow-hidden">
+      <div className="relative z-10 w-full flex flex-col">
         <GlitchHeader score={score} />
 
         {/* Main Interface */}
-        <main className="flex-1 w-full max-w-7xl mx-auto flex flex-col lg:grid lg:grid-cols-12 gap-6 min-h-0 overflow-hidden px-4 md:px-6">
-          
-          {/* Sidebar: Sonic Log + Music + Themes */}
-          <div className="col-span-12 lg:col-span-4 xl:col-span-3 lg:order-1 order-2 flex flex-col h-full min-h-0">
-            <SonicLog 
-              currentTrack={currentTrack}
-              isPlaying={isPlaying}
-              progress={progress}
-              onTogglePlay={handleTogglePlay}
-              onNext={handleNext}
-              onPrev={handlePrev}
-              currentTheme={theme}
-              onThemeChange={setTheme}
-            />
-          </div>
-
-          {/* Main Content Area: Snake */}
-          <section className="col-span-12 lg:col-span-8 xl:col-span-9 lg:order-2 order-1 flex justify-center items-center h-full min-h-0 relative">
+        <main className="flex-1 w-full max-w-7xl mx-auto flex min-h-0 px-4 md:px-6 py-3">
+          <section className="w-full flex justify-center items-start lg:items-center h-full min-h-0 relative">
              <div className="absolute top-0 left-0 text-[8px] opacity-20 pointer-events-none p-2 uppercase tracking-widest leading-none">STREAMING_LIVE_FEED</div>
              <div className="w-full max-w-[600px] aspect-square flex items-center justify-center">
                <SnakeGame 
