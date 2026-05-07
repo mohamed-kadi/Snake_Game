@@ -10,6 +10,7 @@ import { GlitchFooter } from '@/src/components/GlitchFooter';
 import { SettingsMenu } from '@/src/components/SettingsMenu';
 import { musicService } from '@/src/services/musicService';
 import { highScoreService } from '@/src/services/scoreService';
+import { settingsService } from '@/src/services/settingsService';
 import { GameStatus, GameTheme } from '@/src/utils/types';
 
 export default function App() {
@@ -44,6 +45,10 @@ export default function App() {
   ];
 
   useEffect(() => {
+    const savedSettings = settingsService.getSettings();
+    setTheme(savedSettings.theme);
+    setFontFamily(savedSettings.fontFamily);
+    setIsMuted(savedSettings.isMuted);
     setBestScore(highScoreService.getBestScore());
   }, []);
 
@@ -53,6 +58,14 @@ export default function App() {
       highScoreService.setBestScore(score);
     }
   }, [score, bestScore]);
+
+  useEffect(() => {
+    settingsService.saveSettings({
+      theme,
+      fontFamily,
+      isMuted,
+    });
+  }, [theme, fontFamily, isMuted]);
 
   // Handle Game Status Changes (Stop music on crash)
   useEffect(() => {
