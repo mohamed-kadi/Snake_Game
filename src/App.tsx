@@ -114,6 +114,27 @@ export default function App() {
   }, [isMuted]);
 
   useEffect(() => {
+    const pauseIfPlaying = () => {
+      setGameStatus((currentStatus) => (
+        currentStatus === GameStatus.PLAYING ? GameStatus.PAUSED : currentStatus
+      ));
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') {
+        pauseIfPlaying();
+      }
+    };
+
+    window.addEventListener('blur', pauseIfPlaying);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('blur', pauseIfPlaying);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
